@@ -1,5 +1,22 @@
 import { z } from 'zod';
 
+/* ── Phase 1: Header Mapping Types ── */
+
+export interface CRMField {
+  key: string;
+  label: string;
+  type: 'text' | 'tel' | 'email' | 'select' | 'date';
+  required: boolean;
+  description: string;
+}
+
+export interface CSVColumnMapping {
+  crmFieldKey: string;
+  csvHeader: string | null;
+}
+
+/* ── Phase 2: AI Extraction Types ── */
+
 export const CrmStatusEnum = z.enum([
   'GOOD_LEAD_FOLLOW_UP',
   'DID_NOT_CONNECT',
