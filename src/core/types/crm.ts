@@ -1,23 +1,49 @@
-export type CRMFieldType = 'text' | 'email' | 'tel';
+import { z } from 'zod';
 
-export interface CRMField {
-  key: string;
-  label: string;
-  required: boolean;
-  description: string;
-  example: string;
-  type: CRMFieldType;
-}
+export const CrmStatusEnum = z.enum([
+  'GOOD_LEAD_FOLLOW_UP',
+  'DID_NOT_CONNECT',
+  'BAD_LEAD',
+  'SALE_DONE',
+]);
+export type CrmStatus = z.infer<typeof CrmStatusEnum>;
 
-export interface CSVColumnMapping {
-  crmFieldKey: string;
-  csvHeader: string | null;
+export const DataSourceEnum = z.enum([
+  'leads_on_demand',
+  'meridian_tower',
+  'eden_park',
+  'varah_swamy',
+  'sarjapur_plots',
+]);
+export type DataSource = z.infer<typeof DataSourceEnum>;
+
+// Represents the expected structured output from the AI for a single row
+export interface AIExtractedRecord {
+  created_at: string | null;
+  name: string | null;
+  email: string | null;
+  country_code: string | null;
+  mobile_without_country_code: string | null;
+  company: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  lead_owner: string | null;
+  crm_status: string | null; // Extracted as string, normalized later
+  crm_note: string | null;
+  data_source: string | null; // Extracted as string, normalized later
+  possession_time: string | null;
+  description: string | null;
+  // Extra arrays collected by the AI
+  extra_emails?: string[];
+  extra_phones?: string[];
 }
 
 export interface ValidationRecord {
   index: number;
   originalData: Record<string, string>;
-  cleanedData: Record<string, string>;
+  extractedData: AIExtractedRecord | null;
+  normalizedData: Record<string, any>;
   isValid: boolean;
   errors: string[];
 }
