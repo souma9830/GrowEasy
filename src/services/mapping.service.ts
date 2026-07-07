@@ -1,7 +1,7 @@
-import { CRMField, CSVColumnMapping } from '@/core/types/crm';
-import { IAIMappingProvider } from '@/lib/ai/provider';
-import { MockAIProvider } from '@/lib/ai/mock.provider';
-import { GeminiProvider } from '@/lib/ai/gemini.provider';
+import { CRMField, CSVColumnMapping } from '@/src/core/types/crm';
+import { IAIMappingProvider } from '@/src/lib/ai/provider';
+import { MockAIProvider } from '@/src/lib/ai/mock.provider';
+import { GeminiProvider } from '@/src/lib/ai/gemini.provider';
 
 export type AIProviderType = 'mock' | 'gemini' | 'anthropic';
 
@@ -34,7 +34,7 @@ export class MappingService {
     try {
       return await provider.mapHeaders(csvHeaders, sampleRows, schema, { apiKey });
     } catch (error) {
-      console.warn(`Provider ${providerType} failed. Falling back to mock.`, error);
+
       // Fallback to mock if API fails (e.g. invalid key, rate limit)
       provider = new MockAIProvider();
       return await provider.mapHeaders(csvHeaders, sampleRows, schema, {});
