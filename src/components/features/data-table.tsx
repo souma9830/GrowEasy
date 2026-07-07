@@ -3,7 +3,7 @@ import { cn } from '@/src/lib/utils/cn';
 
 interface DataTableProps {
   headers: string[];
-  rows: Record<string, any>[];
+  rows: Record<string, unknown>[];
   maxHeight?: string;
   className?: string;
 }
