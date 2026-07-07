@@ -1,19 +1,19 @@
 'use client';
 
 import { useCallback } from 'react';
-import { Header } from '@/src/components/layout/header';
-import { PageShell } from '@/src/components/layout/page-shell';
-import { PageTitle } from '@/src/components/layout/page-title';
-import { Section } from '@/src/components/layout/section';
-import { Card } from '@/src/components/ui/card';
-import { EmptyState } from '@/src/components/ui/states';
-import { FileUpload } from '@/src/components/features/file-upload';
-import { CsvPreview } from '@/src/components/features/csv-preview';
-import { ProcessingState } from '@/src/components/features/processing-state';
-import { ImportResults } from '@/src/components/features/import-results';
-import { useImportFlow } from '@/src/hooks/use-import-flow';
-import { parseCSV } from '@/src/lib/csv/parser';
-import { apiClient } from '@/src/lib/api/client';
+import { Header } from '@/components/layout/header';
+import { PageShell } from '@/components/layout/page-shell';
+import { PageTitle } from '@/components/layout/page-title';
+import { Section } from '@/components/layout/section';
+import { Card } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/states';
+import { FileUpload } from '@/components/features/file-upload';
+import { CsvPreview } from '@/components/features/csv-preview';
+import { ProcessingState } from '@/components/features/processing-state';
+import { ImportResults } from '@/components/features/import-results';
+import { useImportFlow } from '@/hooks/use-import-flow';
+import { parseCSV } from '@/lib/csv/parser';
+import { apiClient } from '@/lib/api/client';
 import { FileSpreadsheet, ArrowRight, Shield, Zap } from 'lucide-react';
 
 export default function Home() {
