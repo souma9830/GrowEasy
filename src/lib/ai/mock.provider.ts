@@ -1,4 +1,4 @@
-import { CRMField, CSVColumnMapping } from '@/src/core/types/crm';
+import { CRMField, CSVColumnMapping } from '@/core/types/crm';
 import { IAIMappingProvider, AIProviderConfig } from './provider';
 
 export class MockAIProvider implements IAIMappingProvider {
