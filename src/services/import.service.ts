@@ -1,7 +1,7 @@
-import { ImportResult, ValidationRecord } from '@/src/core/types/crm';
+import { ImportResult, ValidationRecord } from '@/core/types/crm';
 import { ExtractionOrchestrator } from './extraction.orchestrator';
 import { ValidationService } from './validation.service';
-import { Logger } from '@/src/lib/logger/logger';
+import { Logger } from '@/lib/logger/logger';
 
 export class ImportService {
   /**
