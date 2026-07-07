@@ -1,8 +1,8 @@
-import { AIExtractedRecord } from '@/src/core/types/crm';
-import { BATCH_SIZE, MAX_RETRIES } from '@/src/core/constants/crm';
-import { chunkArray, withRetry } from '@/src/lib/utils/batch';
-import { AIExtractorService } from '@/src/lib/ai/extractor';
-import { Logger } from '@/src/lib/logger/logger';
+import { AIExtractedRecord } from '@/core/types/crm';
+import { BATCH_SIZE, MAX_RETRIES } from '@/core/constants/crm';
+import { chunkArray, withRetry } from '@/lib/utils/batch';
+import { AIExtractorService } from '@/lib/ai/extractor';
+import { Logger } from '@/lib/logger/logger';
 
 export class ExtractionOrchestrator {
   /**
