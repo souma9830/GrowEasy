@@ -1,90 +1,33 @@
-import { CRMField } from '../types/crm';
+export const BATCH_SIZE = 10;
+export const MAX_RETRIES = 3;
 
-export const TARGET_CRM_SCHEMA: CRMField[] = [
-  {
-    key: 'name',
-    label: 'Full Name',
-    required: true,
-    description: 'The name of the customer, lead, or client.',
-    example: 'John Doe',
-    type: 'text'
-  },
-  {
-    key: 'mobile_without_country_code',
-    label: 'Mobile Number',
-    required: true,
-    description: 'WhatsApp, phone, or contact number, cleaned of country codes and symbols.',
-    example: '9876543210',
-    type: 'tel'
-  },
-  {
-    key: 'email',
-    label: 'Email Address',
-    required: false,
-    description: 'Primary email address of the lead.',
-    example: 'john@example.com',
-    type: 'email'
-  },
-  {
-    key: 'company',
-    label: 'Company Name',
-    required: false,
-    description: 'The company or organization the lead belongs to.',
-    example: 'Acme Corp',
-    type: 'text'
-  },
-  {
-    key: 'job_title',
-    label: 'Job Title',
-    required: false,
-    description: 'The designation or role of the lead.',
-    example: 'Software Engineer',
-    type: 'text'
-  },
-  {
-    key: 'lead_status',
-    label: 'Lead Status',
-    required: false,
-    description: 'Current status of the lead (e.g. New, Contacted, Qualified, Closed).',
-    example: 'New',
-    type: 'text'
-  },
-  {
-    key: 'notes',
-    label: 'Notes / Comments',
-    required: false,
-    description: 'Any additional details, descriptions, or comments.',
-    example: 'Looking for enterprise pricing.',
-    type: 'text'
-  }
-];
+export const AI_EXTRACTION_PROMPT_TEMPLATE = `
+You are a highly intelligent data extraction engine.
+Your task is to analyze a batch of raw CSV rows (represented as JSON objects) and extract specific fields according to strict rules.
 
-export const AI_MAPPING_PROMPT_TEMPLATE = `
-You are an intelligent data mapping assistant.
-Your task is to map a list of CSV headers to a standardized CRM schema based on semantic meaning.
+EXTRACT THE FOLLOWING FIELDS FOR EACH ROW:
+- created_at: Any date/time mentioned.
+- name: Full name of the lead/customer.
+- email: The primary email address.
+- country_code: The phone country code (e.g., "91", "1") if present.
+- mobile_without_country_code: The local phone number digits only.
+- company: Company or organization name.
+- city: City name.
+- state: State/Province name.
+- country: Country name.
+- lead_owner: Name or email of the person handling the lead.
+- crm_status: Infer the status. Must map to ONE of: GOOD_LEAD_FOLLOW_UP, DID_NOT_CONNECT, BAD_LEAD, SALE_DONE. If unknown, leave null.
+- crm_note: General notes, remarks, follow-up comments.
+- data_source: Infer the source. Must map to ONE of: leads_on_demand, meridian_tower, eden_park, varah_swamy, sarjapur_plots. Leave null if not matched.
+- possession_time: When the lead expects possession.
+- description: General description.
 
-TARGET CRM SCHEMA:
-{schema_description}
+SPECIAL INSTRUCTIONS:
+- If you detect multiple emails, put the first in "email" and the rest in an array "extra_emails".
+- If you detect multiple phones, put the first in "mobile_without_country_code" and the rest in an array "extra_phones".
+- Return ONLY a valid JSON array of objects matching this exact structure exactly in the same order as the input rows.
+- No markdown, no explanations.
 
-SOURCE CSV HEADERS:
-{csv_headers}
-
-SAMPLE DATA ROWS:
-{sample_rows}
-
-Analyze the headers and sample data to understand the context.
-Return ONLY a valid JSON object mapping the CRM field keys to the exact source CSV headers.
-If there is no logical match for a CRM field, map it to null.
-Do not include markdown blocks or any other text.
-
-Example JSON output format:
-{{
-  "name": "Customer Full Name",
-  "mobile_without_country_code": "WhatsApp Number",
-  "email": "Contact Email",
-  "company": null,
-  "job_title": "Designation",
-  "lead_status": "Stage",
-  "notes": null
-}}
+RAW BATCH INPUT:
+{batch_json}
 `;
