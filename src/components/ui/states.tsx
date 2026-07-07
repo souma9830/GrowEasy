@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/src/lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 import { AlertCircle, FileQuestion } from 'lucide-react';
 import { Button } from './button';
 
