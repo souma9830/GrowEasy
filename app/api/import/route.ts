@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { ImportService } from '@/services/import.service';
-import { TARGET_CRM_SCHEMA } from '@/core/constants/crm';
+import { Logger } from '@/lib/logger/logger';
 
+// Updated validation schema for incoming request
 const importRequestSchema = z.object({
   rawRows: z.array(z.record(z.string())),
-  mappings: z.array(z.object({
-    crmFieldKey: z.string(),
-    csvHeader: z.string().nullable()
-  }))
+  apiKey: z.string().min(1, "API Key is required for AI extraction")
 });
 
 export async function POST(request: Request) {
@@ -17,6 +15,7 @@ export async function POST(request: Request) {
     const parsed = importRequestSchema.safeParse(body);
     
     if (!parsed.success) {
+      Logger.warn("Invalid /api/import request payload");
       return NextResponse.json({ 
         success: false, 
         error: "Invalid request payload", 
@@ -24,14 +23,10 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { rawRows, mappings } = parsed.data;
+    const { rawRows, apiKey } = parsed.data;
 
     // Process the import via the orchestrator service
-    const importResult = await ImportService.processImport(
-      rawRows,
-      mappings,
-      TARGET_CRM_SCHEMA
-    );
+    const importResult = await ImportService.processImport(rawRows, apiKey);
 
     return NextResponse.json({
       success: true,
@@ -39,7 +34,7 @@ export async function POST(request: Request) {
     });
     
   } catch (error: any) {
-    console.error('API Error in /api/import:', error);
+    Logger.error('API Error in /api/import:', error);
     return NextResponse.json({ 
       success: false, 
       error: error.message || 'Internal Server Error' 
