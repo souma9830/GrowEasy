@@ -1,5 +1,5 @@
-import { CRMField, CSVColumnMapping } from '@/src/core/types/crm';
-import { AI_MAPPING_PROMPT_TEMPLATE } from '@/src/core/constants/crm';
+import { CRMField, CSVColumnMapping } from '@/core/types/crm';
+import { AI_MAPPING_PROMPT_TEMPLATE } from '@/core/constants/crm';
 import { IAIMappingProvider, AIProviderConfig } from './provider';
 
 export class GeminiProvider implements IAIMappingProvider {
