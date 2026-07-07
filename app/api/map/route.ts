@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { MappingService, AIProviderType } from '@/src/services/mapping.service';
-import { TARGET_CRM_SCHEMA } from '@/src/core/constants/crm';
+import { MappingService, AIProviderType } from '@/services/mapping.service';
+import { TARGET_CRM_SCHEMA } from '@/core/constants/crm';
 
 // Validation schema for incoming request
 const mapRequestSchema = z.object({
