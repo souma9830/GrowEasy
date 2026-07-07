@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { ImportService } from '@/src/services/import.service';
-import { Logger } from '@/src/lib/logger/logger';
+import { ImportService } from '@/services/import.service';
+import { Logger } from '@/lib/logger/logger';
 
 // Updated validation schema for incoming request
 const importRequestSchema = z.object({
