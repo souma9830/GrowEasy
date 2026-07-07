@@ -45,7 +45,7 @@ export class GeminiProvider implements IAIMappingProvider {
         crmFieldKey: field.key,
         csvHeader: jsonMap[field.key] || null
       }));
-    } catch (e) {
+    } catch {
 
       throw new Error('Failed to parse LLM response into valid JSON mapping.');
     }
