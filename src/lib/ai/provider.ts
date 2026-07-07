@@ -1,4 +1,4 @@
-import { CRMField, CSVColumnMapping } from '@/src/core/types/crm';
+import { CRMField, CSVColumnMapping } from '@/core/types/crm';
 
 export interface AIProviderConfig {
   apiKey?: string;
