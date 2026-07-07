@@ -39,11 +39,10 @@ export async function POST(request: Request) {
       data: mappings
     });
     
-  } catch (error: any) {
-
+  } catch (error: unknown) {
     return NextResponse.json({ 
       success: false, 
-      error: error.message || 'Internal Server Error' 
+      error: error instanceof Error ? error.message : 'Internal Server Error' 
     }, { status: 500 });
   }
 }
