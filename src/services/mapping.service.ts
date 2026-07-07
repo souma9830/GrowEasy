@@ -33,7 +33,7 @@ export class MappingService {
 
     try {
       return await provider.mapHeaders(csvHeaders, sampleRows, schema, { apiKey });
-    } catch (error) {
+    } catch {
 
       // Fallback to mock if API fails (e.g. invalid key, rate limit)
       provider = new MockAIProvider();
