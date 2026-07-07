@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card } from '@/src/components/ui/card';
-import { Button } from '@/src/components/ui/button';
-import { Input } from '@/src/components/ui/input';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { DataTable } from './data-table';
-import { ParsedCSV } from '@/src/lib/csv/parser';
+import { ParsedCSV } from '@/lib/csv/parser';
 import { FileSpreadsheet, Rows3, Columns3, ArrowRight } from 'lucide-react';
 
 interface CsvPreviewProps {
