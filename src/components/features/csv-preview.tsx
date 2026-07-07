@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card } from '@/src/components/ui/card';
-import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import { Input } from '@/src/components/ui/input';
 import { DataTable } from './data-table';
