@@ -49,8 +49,9 @@ export default function Home() {
     try {
       const result = await apiClient.importRecords(state.csvData.data, state.apiKey);
       onImportSuccess(result);
-    } catch (err: any) {
-      onImportFailure(err.message || 'Import failed. Please check your API key and try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Import failed. Please check your API key and try again.';
+      onImportFailure(errorMessage);
     }
   }, [state.csvData, state.apiKey, startImport, onImportSuccess, onImportFailure]);
 
