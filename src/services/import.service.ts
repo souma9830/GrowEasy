@@ -1,42 +1,50 @@
-import { CRMField, CSVColumnMapping, ImportResult, ValidationRecord } from '@/core/types/crm';
+import { ImportResult, ValidationRecord } from '@/core/types/crm';
+import { ExtractionOrchestrator } from './extraction.orchestrator';
 import { ValidationService } from './validation.service';
+import { Logger } from '@/lib/logger/logger';
 
 export class ImportService {
   /**
-   * Processes a full dataset of CSV rows. 
-   * Validates each row, separates valid from skipped records, and generates statistics.
+   * Processes a full dataset of CSV rows using the AI extraction engine. 
+   * Orchestrates batching, AI inference, and validation.
    */
   static async processImport(
     rawRows: Record<string, string>[],
-    mappings: CSVColumnMapping[],
-    schema: CRMField[]
+    apiKey: string
   ): Promise<ImportResult> {
     
+    // Filter out completely empty rows before hitting the AI
+    const validRawRows = rawRows.filter(row => 
+      !Object.values(row).every(val => !val || val.trim() === '')
+    );
+
+    Logger.info(`Starting ImportService for ${validRawRows.length} rows.`);
+
+    // 1. Run the AI Extraction Orchestrator (handles batching & retries)
+    const extractedRecords = await ExtractionOrchestrator.processDataset(validRawRows, apiKey);
+
     const validRecords: ValidationRecord[] = [];
     const skippedRecords: ValidationRecord[] = [];
 
-    // Process each record
-    rawRows.forEach((row, index) => {
-      // Skip completely empty rows
-      if (Object.values(row).every(val => !val || val.trim() === '')) {
-        return;
-      }
-
-      const record = ValidationService.validateRecord(row, index, mappings, schema);
+    // 2. Validate and Normalize each extracted record
+    validRawRows.forEach((row, index) => {
+      // In case AI returned fewer records or failed a batch, extractedData might be undefined/null
+      const extractedData = extractedRecords[index] || null;
       
-      if (record.isValid) {
-        validRecords.push(record);
+      const validatedRecord = ValidationService.validateExtractedRecord(row, extractedData, index);
+      
+      if (validatedRecord.isValid) {
+        validRecords.push(validatedRecord);
       } else {
-        skippedRecords.push(record);
+        skippedRecords.push(validatedRecord);
       }
     });
 
-    // Simulate database insertion latency for the valid records
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Calculate stats
+    // 3. Calculate stats
     const totalProcessed = validRecords.length + skippedRecords.length;
     const successRate = totalProcessed === 0 ? 0 : Math.round((validRecords.length / totalProcessed) * 100);
+
+    Logger.info(`Import processing complete. ${validRecords.length} valid, ${skippedRecords.length} skipped.`);
 
     return {
       stats: {
