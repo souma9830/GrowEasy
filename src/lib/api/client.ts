@@ -1,4 +1,4 @@
-import { ImportResult } from '@/src/core/types/crm';
+import { ImportResult } from '@/core/types/crm';
 
 interface ApiResponse<T> {
   success: boolean;
