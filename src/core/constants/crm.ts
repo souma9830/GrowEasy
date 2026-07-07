@@ -1,6 +1,34 @@
 export const BATCH_SIZE = 10;
 export const MAX_RETRIES = 3;
 
+/* ── Phase 1: Header Mapping Constants ── */
+
+import type { CRMField } from '@/src/core/types/crm';
+
+export const TARGET_CRM_SCHEMA: CRMField[] = [
+  { key: 'name', label: 'Name', type: 'text', required: true, description: 'Full name of the lead or customer.' },
+  { key: 'mobile_without_country_code', label: 'Mobile Number', type: 'tel', required: true, description: 'Local mobile number without country code.' },
+  { key: 'email', label: 'Email', type: 'email', required: false, description: 'Email address.' },
+  { key: 'company', label: 'Company', type: 'text', required: false, description: 'Company or organization name.' },
+  { key: 'job_title', label: 'Job Title', type: 'text', required: false, description: 'Job title or role.' },
+  { key: 'lead_status', label: 'Lead Status', type: 'select', required: false, description: 'Status of the lead.' },
+  { key: 'notes', label: 'Notes', type: 'text', required: false, description: 'Miscellaneous notes or remarks.' },
+];
+
+export const AI_MAPPING_PROMPT_TEMPLATE = `You are a data schema mapping engine. Map the following CSV headers to the CRM schema fields. Return ONLY a valid JSON object where keys are CRM field keys and values are the matching CSV header string or null if no match.
+
+CRM Schema:
+{schema_description}
+
+CSV Headers:
+{csv_headers}
+
+Sample Rows:
+{sample_rows}
+`;
+
+/* ── Phase 2: AI Extraction Constants ── */
+
 export const AI_EXTRACTION_PROMPT_TEMPLATE = `
 You are a highly intelligent data extraction engine.
 Your task is to analyze a batch of raw CSV rows (represented as JSON objects) and extract specific fields according to strict rules.
