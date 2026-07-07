@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { ImportService } from '@/services/import.service';
-import { Logger } from '@/lib/logger/logger';
+import { ImportService } from '@/src/services/import.service';
+import { Logger } from '@/src/lib/logger/logger';
 
 // Updated validation schema for incoming request
 const importRequestSchema = z.object({
-  rawRows: z.array(z.record(z.string())),
+  rawRows: z.array(z.record(z.string(), z.string())),
   apiKey: z.string().min(1, "API Key is required for AI extraction")
 });
 
