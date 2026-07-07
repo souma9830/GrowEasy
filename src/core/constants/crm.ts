@@ -3,7 +3,7 @@ export const MAX_RETRIES = 3;
 
 /* ── Phase 1: Header Mapping Constants ── */
 
-import type { CRMField } from '@/src/core/types/crm';
+import type { CRMField } from '@/core/types/crm';
 
 export const TARGET_CRM_SCHEMA: CRMField[] = [
   { key: 'name', label: 'Name', type: 'text', required: true, description: 'Full name of the lead or customer.' },
