@@ -1,8 +1,8 @@
 'use client';
 
 import { useReducer, useCallback } from 'react';
-import { ParsedCSV } from '@/src/lib/csv/parser';
-import { ImportResult } from '@/src/core/types/crm';
+import { ParsedCSV } from '@/lib/csv/parser';
+import { ImportResult } from '@/core/types/crm';
 
 export type ImportStep = 'upload' | 'preview' | 'processing' | 'results';
 
