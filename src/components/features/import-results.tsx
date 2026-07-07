@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Card } from '@/src/components/ui/card';
-import { Badge } from '@/src/components/ui/badge';
-import { Button } from '@/src/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DataTable } from './data-table';
-import { ImportResult, ValidationRecord } from '@/src/core/types/crm';
+import { ImportResult, ValidationRecord } from '@/core/types/crm';
 import { CheckCircle2, XCircle, RotateCcw, Users, UserX, BarChart3 } from 'lucide-react';
 
 interface ImportResultsProps {
