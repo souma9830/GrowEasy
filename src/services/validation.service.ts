@@ -11,7 +11,7 @@ export class ValidationService {
     index: number
   ): ValidationRecord {
     const errors: string[] = [];
-    const normalizedData: Record<string, any> = {};
+    const normalizedData: Record<string, unknown> = {};
 
     if (!extractedRow) {
       return {
