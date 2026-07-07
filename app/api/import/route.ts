@@ -33,11 +33,11 @@ export async function POST(request: Request) {
       data: importResult
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     Logger.error('API Error in /api/import:', error);
     return NextResponse.json({ 
       success: false, 
-      error: error.message || 'Internal Server Error' 
+      error: error instanceof Error ? error.message : 'Internal Server Error' 
     }, { status: 500 });
   }
 }
