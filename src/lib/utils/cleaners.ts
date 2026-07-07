@@ -48,3 +48,13 @@ export const cleanEmail = (rawEmail: string): string | null => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(cleaned) ? cleaned : null;
 };
+
+/**
+ * Formats a date string into ISO format, or returns null if invalid.
+ */
+export const formatDateISO = (dateStr: string | null | undefined): string | null => {
+  if (!dateStr) return null;
+  const parsed = new Date(dateStr);
+  if (isNaN(parsed.getTime())) return null;
+  return parsed.toISOString();
+};
