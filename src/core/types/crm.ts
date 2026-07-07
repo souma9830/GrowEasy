@@ -60,7 +60,7 @@ export interface ValidationRecord {
   index: number;
   originalData: Record<string, string>;
   extractedData: AIExtractedRecord | null;
-  normalizedData: Record<string, any>;
+  normalizedData: Record<string, unknown>;
   isValid: boolean;
   errors: string[];
 }
