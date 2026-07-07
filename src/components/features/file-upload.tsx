@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
-import { cn } from '@/src/lib/utils/cn';
+import { cn } from '@/lib/utils/cn';
 import { Upload, File, X, CheckCircle2 } from 'lucide-react';
 
 
