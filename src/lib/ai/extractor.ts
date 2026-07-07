@@ -1,6 +1,6 @@
-import { AIExtractedRecord } from '@/core/types/crm';
-import { AI_EXTRACTION_PROMPT_TEMPLATE } from '@/core/constants/crm';
-import { Logger } from '@/lib/logger/logger';
+import { AIExtractedRecord } from '@/src/core/types/crm';
+import { AI_EXTRACTION_PROMPT_TEMPLATE } from '@/src/core/constants/crm';
+import { Logger } from '@/src/lib/logger/logger';
 
 export class AIExtractorService {
   /**
