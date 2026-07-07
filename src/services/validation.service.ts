@@ -1,5 +1,5 @@
-import { AIExtractedRecord, ValidationRecord, CrmStatusEnum, DataSourceEnum } from '@/core/types/crm';
-import { cleanPhoneNumber, cleanEmail, formatDateISO } from '@/lib/utils/cleaners';
+import { AIExtractedRecord, ValidationRecord, CrmStatusEnum, DataSourceEnum } from '@/src/core/types/crm';
+import { cleanPhoneNumber, cleanEmail, formatDateISO } from '@/src/lib/utils/cleaners';
 
 export class ValidationService {
   /**
