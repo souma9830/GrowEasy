@@ -25,10 +25,11 @@ export class ExtractionOrchestrator {
         );
         allResults.push(...batchResults);
       } catch (error) {
-        Logger.error(`Batch ${i + 1} failed permanently after ${MAX_RETRIES} retries. Skipping batch.`, error);
-        // We push nulls to maintain index alignment with the raw dataset if needed, 
-        // or we simply skip. We'll skip here, but log it.
-        // For alignment, we could push null records.
+        Logger.error(`Batch ${i + 1} failed permanently after ${MAX_RETRIES} retries. Filling with nulls for alignment.`, error);
+        // Push nulls to maintain index alignment with the raw dataset
+        for (let j = 0; j < batch.length; j++) {
+          allResults.push(null as unknown as AIExtractedRecord);
+        }
       }
     }
 
