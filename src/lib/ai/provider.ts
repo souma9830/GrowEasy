@@ -6,9 +6,7 @@ export interface AIProviderConfig {
 }
 
 export interface IAIMappingProvider {
-  /**
-   * Maps CSV headers to the provided CRM schema based on semantic meaning and sample data.
-   */
+
   mapHeaders(
     csvHeaders: string[],
     sampleRows: Record<string, string>[],
