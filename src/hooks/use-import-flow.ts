@@ -9,7 +9,6 @@ export type ImportStep = 'upload' | 'preview' | 'processing' | 'results';
 export interface ImportState {
   step: ImportStep;
   csvData: ParsedCSV | null;
-  apiKey: string;
   result: ImportResult | null;
   error: string | null;
   isLoading: boolean;
@@ -17,7 +16,6 @@ export interface ImportState {
 
 type ImportAction =
   | { type: 'CSV_PARSED'; payload: ParsedCSV }
-  | { type: 'SET_API_KEY'; payload: string }
   | { type: 'START_IMPORT' }
   | { type: 'IMPORT_SUCCESS'; payload: ImportResult }
   | { type: 'IMPORT_FAILURE'; payload: string }
@@ -26,7 +24,6 @@ type ImportAction =
 const initialState: ImportState = {
   step: 'upload',
   csvData: null,
-  apiKey: '',
   result: null,
   error: null,
   isLoading: false,
@@ -41,8 +38,6 @@ function importReducer(state: ImportState, action: ImportAction): ImportState {
         csvData: action.payload,
         error: null,
       };
-    case 'SET_API_KEY':
-      return { ...state, apiKey: action.payload };
     case 'START_IMPORT':
       return { ...state, step: 'processing', isLoading: true, error: null };
     case 'IMPORT_SUCCESS':
@@ -73,10 +68,6 @@ export function useImportFlow() {
     dispatch({ type: 'CSV_PARSED', payload: data });
   }, []);
 
-  const setApiKey = useCallback((key: string) => {
-    dispatch({ type: 'SET_API_KEY', payload: key });
-  }, []);
-
   const startImport = useCallback(() => {
     dispatch({ type: 'START_IMPORT' });
   }, []);
@@ -96,7 +87,6 @@ export function useImportFlow() {
   return {
     state,
     onCsvParsed,
-    setApiKey,
     startImport,
     onImportSuccess,
     onImportFailure,
