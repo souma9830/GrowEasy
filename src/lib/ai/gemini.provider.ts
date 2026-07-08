@@ -17,7 +17,7 @@ export class GeminiProvider implements IAIMappingProvider {
       .replace('{csv_headers}', JSON.stringify(csvHeaders))
       .replace('{sample_rows}', JSON.stringify(sampleRows, null, 2));
 
-    const model = config.model || 'gemini-2.0-flash';
+    const model = config.model || 'gemini-3.5-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.apiKey}`;
 
     const response = await fetch(url, {
