@@ -66,10 +66,7 @@ export class ValidationService {
     normalizedData.possession_time = formatDateISO(extractedRow.possession_time);
     normalizedData.description = extractedRow.description || '';
 
-    // If name is fundamentally required by the schema, check it
-    if (!normalizedData.name) {
-      errors.push('Name is required but missing.');
-    }
+    // Name is optional — GrowEasy only requires at least one contact method
 
     const isValid = errors.length === 0;
 
