@@ -1,15 +1,12 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DataTable } from './data-table';
 import { ParsedCSV } from '@/lib/csv/parser';
 import { FileSpreadsheet, Rows3, Columns3, ArrowRight } from 'lucide-react';
 
 interface CsvPreviewProps {
   csvData: ParsedCSV;
-  apiKey: string;
-  onApiKeyChange: (key: string) => void;
   onConfirmImport: () => void;
   isLoading: boolean;
   error: string | null;
@@ -18,8 +15,6 @@ interface CsvPreviewProps {
 
 export const CsvPreview: React.FC<CsvPreviewProps> = ({
   csvData,
-  apiKey,
-  onApiKeyChange,
   onConfirmImport,
   isLoading,
   error,
@@ -73,14 +68,6 @@ export const CsvPreview: React.FC<CsvPreviewProps> = ({
 
       <Card padding="md">
         <div className="flex flex-col gap-4">
-          <Input
-            label="Gemini API Key"
-            type="password"
-            placeholder="Enter your Google Gemini API key"
-            value={apiKey}
-            onChange={(e) => onApiKeyChange(e.target.value)}
-            hint="Required for AI-powered extraction. Your key is never stored."
-          />
 
           {error && (
             <p className="text-xs text-[var(--color-error)]" role="alert">
@@ -96,7 +83,6 @@ export const CsvPreview: React.FC<CsvPreviewProps> = ({
               variant="primary"
               size="md"
               onClick={onConfirmImport}
-              disabled={!apiKey.trim()}
               loading={isLoading}
             >
               Start AI Import
