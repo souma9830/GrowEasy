@@ -28,7 +28,7 @@ export const apiClient = {
   /**
    * Sends raw CSV rows and an API key to the backend for AI extraction and import.
    */
-  importRecords: (rawRows: Record<string, string>[], apiKey: string): Promise<ImportResult> => {
-    return request<ImportResult>('/import', { rawRows, apiKey });
+  importRecords: (rawRows: Record<string, string>[]): Promise<ImportResult> => {
+    return request<ImportResult>('/import', { rawRows });
   },
 };
