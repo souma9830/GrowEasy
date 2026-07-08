@@ -3,9 +3,6 @@ import { AI_EXTRACTION_PROMPT_TEMPLATE } from '@/core/constants/crm';
 import { Logger } from '@/lib/logger/logger';
 
 export class AIExtractorService {
-  /**
-   * Calls the Gemini REST API to extract structured fields from a batch of raw JSON rows.
-   */
   static async extractBatch(
     batchId: number,
     rawRows: Record<string, string>[],
@@ -28,7 +25,7 @@ export class AIExtractorService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { 
+          generationConfig: {
             responseMimeType: 'application/json',
             temperature: 0.1 // Low temperature for deterministic output
           }
@@ -48,11 +45,11 @@ export class AIExtractorService {
       }
 
       const parsed: AIExtractedRecord[] = JSON.parse(resultText);
-      
-      Logger.info(`AI Extraction Batch Success`, { 
-        batchId, 
+
+      Logger.info(`AI Extraction Batch Success`, {
+        batchId,
         processingTimeMs: Date.now() - startTime,
-        recordCount: parsed.length 
+        recordCount: parsed.length
       });
 
       return parsed;
