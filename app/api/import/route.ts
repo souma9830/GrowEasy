@@ -3,10 +3,8 @@ import { z } from 'zod';
 import { ImportService } from '@/services/import.service';
 import { Logger } from '@/lib/logger/logger';
 
-// Updated validation schema for incoming request
 const importRequestSchema = z.object({
-  rawRows: z.array(z.record(z.string(), z.string())),
-  apiKey: z.string().min(1, "API Key is required for AI extraction")
+  rawRows: z.array(z.record(z.string(), z.string()))
 });
 
 export async function POST(request: Request) {
@@ -23,7 +21,16 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { rawRows, apiKey } = parsed.data;
+    const { rawRows } = parsed.data;
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      Logger.error("GEMINI_API_KEY environment variable is not set");
+      return NextResponse.json({ 
+        success: false, 
+        error: "Server configuration error: Gemini API key is missing" 
+      }, { status: 500 });
+    }
 
     // Process the import via the orchestrator service
     const importResult = await ImportService.processImport(rawRows, apiKey);
