@@ -8,10 +8,6 @@ interface DataTableProps {
   className?: string;
 }
 
-/**
- * Responsive, scrollable data table with sticky header.
- * Reused across CSV preview, valid records, and skipped records.
- */
 export const DataTable: React.FC<DataTableProps> = ({
   headers,
   rows,
