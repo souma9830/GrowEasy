@@ -7,8 +7,7 @@ import { TARGET_CRM_SCHEMA } from '@/core/constants/crm';
 const mapRequestSchema = z.object({
   headers: z.array(z.string()).min(1, "At least one header is required"),
   sampleRows: z.array(z.record(z.string(), z.string())).max(10, "Max 10 sample rows allowed"),
-  provider: z.enum(['mock', 'gemini', 'anthropic']).default('mock'),
-  apiKey: z.string().optional()
+  provider: z.enum(['mock', 'gemini', 'anthropic']).default('mock')
 });
 
 export async function POST(request: Request) {
@@ -24,7 +23,9 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { headers, sampleRows, provider, apiKey } = parsed.data;
+    const { headers, sampleRows, provider } = parsed.data;
+
+    const apiKey = process.env.GEMINI_API_KEY;
 
     const mappings = await MappingService.mapHeadersToSchema(
       provider as AIProviderType,
