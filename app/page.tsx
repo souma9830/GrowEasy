@@ -20,7 +20,6 @@ export default function Home() {
   const {
     state,
     onCsvParsed,
-    setApiKey,
     startImport,
     onImportSuccess,
     onImportFailure,
@@ -43,17 +42,17 @@ export default function Home() {
   );
 
   const handleConfirmImport = useCallback(async () => {
-    if (!state.csvData || !state.apiKey.trim()) return;
+    if (!state.csvData) return;
     startImport();
 
     try {
-      const result = await apiClient.importRecords(state.csvData.data, state.apiKey);
+      const result = await apiClient.importRecords(state.csvData.data);
       onImportSuccess(result);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Import failed. Please check your API key and try again.';
       onImportFailure(errorMessage);
     }
-  }, [state.csvData, state.apiKey, startImport, onImportSuccess, onImportFailure]);
+  }, [state.csvData, startImport, onImportSuccess, onImportFailure]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -140,8 +139,6 @@ export default function Home() {
           <Section>
             <CsvPreview
               csvData={state.csvData}
-              apiKey={state.apiKey}
-              onApiKeyChange={setApiKey}
               onConfirmImport={handleConfirmImport}
               isLoading={state.isLoading}
               error={state.error}
