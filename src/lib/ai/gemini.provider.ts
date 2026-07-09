@@ -3,7 +3,7 @@ import { AI_MAPPING_PROMPT_TEMPLATE } from '@/core/constants/crm';
 import { IAIMappingProvider, AIProviderConfig } from './provider';
 
 export class GeminiProvider implements IAIMappingProvider {
-  
+
   async mapHeaders(
     csvHeaders: string[],
     sampleRows: Record<string, string>[],
@@ -17,7 +17,7 @@ export class GeminiProvider implements IAIMappingProvider {
       .replace('{csv_headers}', JSON.stringify(csvHeaders))
       .replace('{sample_rows}', JSON.stringify(sampleRows, null, 2));
 
-    const model = config.model || 'gemini-3.5-flash';
+    const model = config.model || 'gemini-2.5-flash';
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${config.apiKey}`;
 
     const response = await fetch(url, {
@@ -36,9 +36,9 @@ export class GeminiProvider implements IAIMappingProvider {
 
     const data = await response.json();
     const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
+
     if (!resultText) throw new Error('Empty response from Gemini');
-    
+
     try {
       const jsonMap: Record<string, string | null> = JSON.parse(resultText);
       return schema.map(field => ({
