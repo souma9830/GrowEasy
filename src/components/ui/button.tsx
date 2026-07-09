@@ -10,19 +10,19 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<string, string> = {
   primary:
-    'bg-[var(--gray-900)] text-[var(--text-inverse)] hover:bg-[var(--gray-800)] active:bg-[var(--gray-950)]',
+    'bg-[var(--text-primary)] text-[var(--bg-primary)] hover:opacity-85 active:opacity-75',
   secondary:
-    'bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] hover:bg-[var(--gray-50)] active:bg-[var(--gray-100)]',
+    'bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border-default)] hover:bg-[var(--bg-tertiary)] active:bg-[var(--gray-200)]',
   ghost:
-    'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--gray-100)] active:bg-[var(--gray-200)]',
+    'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)] active:bg-[var(--gray-200)]',
   danger:
-    'bg-[var(--color-error)] text-[var(--text-inverse)] hover:bg-red-700 active:bg-red-800',
+    'bg-[var(--color-error)] text-white hover:opacity-85 active:opacity-75',
 };
 
 const sizeStyles: Record<string, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5',
-  md: 'h-9 px-4 text-sm gap-2',
-  lg: 'h-10 px-5 text-sm gap-2',
+  sm: 'h-8  px-3   text-xs  gap-1.5',
+  md: 'h-9  px-4   text-sm  gap-2',
+  lg: 'h-10 px-5   text-sm  gap-2',
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -32,8 +32,10 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center font-medium rounded-[var(--radius-md)] transition-colors duration-[var(--transition-fast)] focus-ring cursor-pointer select-none',
-          'disabled:opacity-50 disabled:pointer-events-none',
+          'inline-flex items-center justify-center font-medium rounded-[var(--radius-md)]',
+          'transition-all duration-[var(--transition-fast)]',
+          'focus-ring cursor-pointer select-none',
+          'disabled:opacity-40 disabled:pointer-events-none',
           variantStyles[variant],
           sizeStyles[size],
           className
@@ -42,7 +44,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading && (
           <svg
-            className="animate-spin h-4 w-4"
+            className="animate-spin h-3.5 w-3.5 shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

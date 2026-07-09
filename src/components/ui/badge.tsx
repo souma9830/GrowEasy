@@ -8,10 +8,10 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<string, string> = {
   default: 'bg-[var(--gray-100)] text-[var(--gray-700)]',
-  success: 'bg-green-50 text-green-700',
-  warning: 'bg-amber-50 text-amber-700',
-  error: 'bg-red-50 text-red-700',
-  info: 'bg-blue-50 text-blue-700',
+  success: 'bg-[var(--brand-50)] text-[var(--color-success)]',
+  warning: 'bg-[rgba(217,119,6,0.10)] text-[var(--color-warning)]',
+  error:   'bg-[rgba(220,38,38,0.10)] text-[var(--color-error)]',
+  info:    'bg-[rgba(37,99,235,0.10)] text-[var(--color-info)]',
 };
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -23,7 +23,7 @@ export const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
+        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium leading-tight',
         variantStyles[variant],
         className
       )}
