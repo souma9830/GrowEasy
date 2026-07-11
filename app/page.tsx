@@ -1,164 +1,94 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { PageShell } from '@/components/layout/page-shell';
 import { PageTitle } from '@/components/layout/page-title';
 import { Section } from '@/components/layout/section';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/states';
-import { FileUpload } from '@/components/features/file-upload';
-import { CsvPreview } from '@/components/features/csv-preview';
-import { ProcessingState } from '@/components/features/processing-state';
-import { ImportResults } from '@/components/features/import-results';
-import { useImportFlow } from '@/hooks/use-import-flow';
-import { parseCSV } from '@/lib/csv/parser';
-import { apiClient } from '@/lib/api/client';
-import { FileSpreadsheet, ArrowRight, Shield, Zap } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { ProjectCard, CreateProjectModal } from '@/components/features';
+import { Card } from '@/components/ui/card';
 
-export default function Home() {
-  const {
-    state,
-    onCsvParsed,
-    startImport,
-    onImportSuccess,
-    onImportFailure,
-    reset,
-  } = useImportFlow();
+export default function ProjectsDashboard() {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleFileSelect = useCallback(
-    async (file: File) => {
-      try {
-        const parsed = await parseCSV(file);
-        if (parsed.data.length === 0) {
-          return;
-        }
-        onCsvParsed(parsed);
-      } catch {
-        onImportFailure('Failed to parse the CSV file. Please check the format and try again.');
-      }
-    },
-    [onCsvParsed, onImportFailure]
-  );
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-  const handleConfirmImport = useCallback(async () => {
-    if (!state.csvData) return;
-    startImport();
-
+  const fetchProjects = async () => {
     try {
-      const result = await apiClient.importRecords(state.csvData.data);
-      onImportSuccess(result);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Import failed. Please check your API key and try again.';
-      onImportFailure(errorMessage);
+      const res = await fetch('/api/projects');
+      const data = await res.json();
+      if (data.success) {
+        setProjects(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch projects', err);
+    } finally {
+      setIsLoading(false);
     }
-  }, [state.csvData, startImport, onImportSuccess, onImportFailure]);
+  };
+
+  const handleProjectCreated = (newProject: any) => {
+    setProjects((prev) => [newProject, ...prev]);
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
 
       <PageShell>
-        <PageTitle
-          title="Import Contacts"
-          description="Upload a CSV file and let AI map your data into the GrowEasy CRM."
-        />
+        <div className="flex justify-between items-center mb-6">
+          <PageTitle
+            title="Projects"
+            description="Manage and track your lead import projects"
+          />
+          <Button variant="primary" onClick={() => setIsModalOpen(true)} className="flex items-center gap-1.5">
+            <Plus size={16} />
+            <span>New Project</span>
+          </Button>
+        </div>
 
-        {state.step === 'upload' && (
-          <>
-            <Section>
-              <Card padding="lg">
-                <div className="mb-5">
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]">
-                    Upload CSV
-                  </h2>
-                  <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                    Drag your file below or click to browse. We accept .csv files up to 10MB.
-                  </p>
-                </div>
-                <FileUpload onFileSelect={handleFileSelect} />
-              </Card>
-            </Section>
-
-            <Section>
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
-                How it works
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  {
-                    icon: <FileSpreadsheet size={18} strokeWidth={1.5} />,
-                    title: 'Upload',
-                    description: "Drop any CSV file — headers, formats, and languages don't matter.",
-                  },
-                  {
-                    icon: <Zap size={18} strokeWidth={1.5} />,
-                    title: 'AI Extraction',
-                    description: 'Our engine reads every row, infers fields, and normalizes the data.',
-                  },
-                  {
-                    icon: <Shield size={18} strokeWidth={1.5} />,
-                    title: 'Validated Import',
-                    description: 'Review clean records, fix issues, and import into your CRM.',
-                  },
-                ].map((step, i) => (
-                  <Card key={i} padding="md" className="flex flex-col gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-[var(--gray-100)] text-[var(--text-secondary)]">
-                      {step.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="text-sm font-medium text-[var(--text-primary)]">
-                          {step.title}
-                        </h3>
-                        {i < 2 && (
-                          <ArrowRight size={12} className="text-[var(--text-tertiary)] hidden sm:block" />
-                        )}
-                      </div>
-                      <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </Section>
-
-            <Section>
-              <Card padding="none">
-                <EmptyState
-                  title="No import results yet"
-                  description="Upload a CSV file above to get started. Your import results will appear here."
-                />
-              </Card>
-            </Section>
-          </>
-        )}
-
-        {state.step === 'preview' && state.csvData && (
-          <Section>
-            <CsvPreview
-              csvData={state.csvData}
-              onConfirmImport={handleConfirmImport}
-              isLoading={state.isLoading}
-              error={state.error}
-              onReset={reset}
-            />
-          </Section>
-        )}
-
-        {state.step === 'processing' && (
-          <Section>
-            <ProcessingState />
-          </Section>
-        )}
-
-        {state.step === 'results' && state.result && (
-          <Section>
-            <ImportResults result={state.result} onReset={reset} />
-          </Section>
-        )}
+        <Section>
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} padding="lg" className="h-40 animate-pulse bg-[var(--bg-secondary)]">
+                  <div />
+                </Card>
+              ))}
+            </div>
+          ) : projects.length === 0 ? (
+            <Card padding="none">
+              <EmptyState
+                title="No projects yet"
+                description="Create your first project to start importing leads"
+                action={{
+                  label: 'Create Project',
+                  onClick: () => setIsModalOpen(true),
+                }}
+              />
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projects.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))}
+            </div>
+          )}
+        </Section>
       </PageShell>
+
+      <CreateProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleProjectCreated}
+      />
     </div>
   );
 }

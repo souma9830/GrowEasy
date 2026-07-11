@@ -4,6 +4,7 @@ import { ImportService } from '@/services/import.service';
 import { Logger } from '@/lib/logger/logger';
 
 const importRequestSchema = z.object({
+  projectId: z.string(),
   rawRows: z.array(z.record(z.string(), z.string()))
 });
 
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const { rawRows } = parsed.data;
+    const { projectId, rawRows } = parsed.data;
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Process the import via the orchestrator service
-    const importResult = await ImportService.processImport(rawRows, apiKey);
+    const importResult = await ImportService.processImport(projectId, rawRows, apiKey);
 
     return NextResponse.json({
       success: true,

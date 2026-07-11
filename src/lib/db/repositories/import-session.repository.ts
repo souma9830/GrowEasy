@@ -5,11 +5,13 @@ import { Logger } from '@/lib/logger/logger';
 export class ImportSessionRepository {
 
   static async create(
+    projectId: string,
     sessionName: string,
     stats: ImportStats
   ): Promise<IImportSession> {
     try {
       const session = await ImportSession.create({
+        projectId,
         sessionName,
         totalRecords: stats.totalRecords,
         importedCount: stats.importedCount,

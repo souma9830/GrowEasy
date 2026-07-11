@@ -10,6 +10,7 @@ import { AIExtractedRecord } from '@/core/types/crm';
 export class ImportService {
 
   static async processImport(
+    projectId: string,
     rawRows: Record<string, string>[],
     apiKey: string
   ): Promise<ImportResult> {
@@ -19,16 +20,12 @@ export class ImportService {
     );
 
     Logger.info(`Starting ImportService for ${validRawRows.length} rows.`);
-
-    // 1. Run the AI Extraction Orchestrator (handles batching & retries)
     const extractedRecords = await ExtractionOrchestrator.processDataset(validRawRows, apiKey);
 
     const validRecords: ValidationRecord[] = [];
     const skippedRecords: ValidationRecord[] = [];
-
-    // 2. Validate and Normalize each extracted record
     validRawRows.forEach((row, index) => {
-      // In case AI returned fewer records or failed a batch, extractedData might be undefined/null
+      
       const extractedData = extractedRecords[index] || null;
 
       const validatedRecord = ValidationService.validateExtractedRecord(row, extractedData, index);
@@ -55,7 +52,7 @@ export class ImportService {
       await connectDB();
 
       const sessionName = `Import_${new Date().toISOString().replace(/[:.]/g, '-')}`;
-      const session = await ImportSessionRepository.create(sessionName, stats);
+      const session = await ImportSessionRepository.create(projectId, sessionName, stats);
 
       if (validRecords.length > 0) {
         // Extract just the normalized data (which matches AIExtractedRecord / ICrmLead shape)

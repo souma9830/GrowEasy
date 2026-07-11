@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import React, { useCallback } from 'react';
+import { Sun, Moon, Monitor, LogOut } from 'lucide-react';
 import { useTheme } from './theme-provider';
+import { useRouter } from 'next/navigation';
 import type { FC } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -15,6 +16,13 @@ const themeOptions: { value: Theme; icon: React.ReactNode; label: string }[] = [
 
 export const Header: FC = () => {
   const { theme, setTheme } = useTheme();
+  const router = useRouter();
+
+  const handleLogout = useCallback(async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+    router.refresh();
+  }, [router]);
 
   return (
     <header className="sticky top-0 z-30 w-full border-b border-[var(--border-default)] bg-[var(--bg-primary)]">
@@ -33,10 +41,10 @@ export const Header: FC = () => {
           </span>
         </div>
 
-        {/* Right side: Theme toggle + Avatar */}
+        {/* Right side */}
         <div className="flex items-center gap-3">
 
-          {/* Theme Toggle — segmented control */}
+          {/* Theme Toggle */}
           <div
             role="group"
             aria-label="Theme selection"
@@ -65,13 +73,16 @@ export const Header: FC = () => {
             })}
           </div>
 
-          {/* Avatar */}
-          <span
-            className="h-7 w-7 rounded-full bg-[var(--bg-tertiary)] border border-[var(--border-default)] flex items-center justify-center text-xs font-semibold text-[var(--text-secondary)]"
-            aria-label="User avatar"
+          {/* Logout button */}
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="Sign out"
+            aria-label="Sign out"
+            className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-md)] border border-[var(--border-default)] text-[var(--text-tertiary)] hover:text-red-500 hover:border-red-500/40 transition-all"
           >
-            S
-          </span>
+            <LogOut size={14} />
+          </button>
         </div>
       </div>
     </header>

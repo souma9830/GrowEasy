@@ -26,8 +26,9 @@ export class AIExtractorService {
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.1 // Low temperature for deterministic output
+            temperature: 0.1,
+            // Note: do NOT set responseMimeType here — it causes gemini-2.5-flash
+            // to echo back the input schema instead of applying the extraction prompt.
           }
         })
       });
@@ -44,7 +45,15 @@ export class AIExtractorService {
         throw new Error('Empty response from Gemini');
       }
 
-      const parsed: AIExtractedRecord[] = JSON.parse(resultText);
+      // Strip markdown code fences if model wraps JSON in ```json ... ```
+      const cleaned = resultText
+        .trim()
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '')
+        .trim();
+
+      const parsed: AIExtractedRecord[] = JSON.parse(cleaned);
 
       Logger.info(`AI Extraction Batch Success`, {
         batchId,
