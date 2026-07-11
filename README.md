@@ -1,19 +1,21 @@
-Test File- [https://drive.google.com/drive/u/0/home](https://drive.google.com/file/d/1q3fhR0Tk4RVXOIV1tUWKy__r-8GUzBBe/view?usp=sharing)
-https://drive.google.com/file/d/1hH87oa7_wwOoAvdtys3RR4WJP1i6JUAM/view?usp=sharing
+Test Files:
+- https://drive.google.com/file/d/1q3fhR0Tk4RVXOIV1tUWKy__r-8GUzBBe/view?usp=sharing
+- https://drive.google.com/file/d/1hH87oa7_wwOoAvdtys3RR4WJP1i6JUAM/view?usp=sharing
 
 
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
   <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Gemini_AI-Integrated-4285F4?style=for-the-badge&logo=google" alt="Gemini AI" />
+  <img src="https://img.shields.io/badge/Gemini_AI-2.5_Flash-4285F4?style=for-the-badge&logo=google" alt="Gemini AI" />
   <img src="https://img.shields.io/badge/MongoDB-Persistent-47A248?style=for-the-badge&logo=mongodb" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Auth-JWT_Cookie-orange?style=for-the-badge" alt="JWT Auth" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
 </p>
 
 # GrowEasy — AI-Powered CSV Importer
 
-> An intelligent CSV importer that leverages LLM-powered semantic extraction to convert arbitrary lead datasets into standardized CRM records — regardless of column names, ordering, or data formatting.
+> An intelligent CSV importer that leverages LLM-powered semantic extraction to convert arbitrary lead datasets into standardized CRM records — regardless of column names, ordering, or data formatting. Organized around project workspaces with per-user authentication and full import history.
 
 ---
 
@@ -22,6 +24,7 @@ https://drive.google.com/file/d/1hH87oa7_wwOoAvdtys3RR4WJP1i6JUAM/view?usp=shari
 - [Project Overview](#project-overview)
 - [Features](#features)
 - [Architecture](#architecture)
+- [User Flow](#user-flow)
 - [Folder Structure](#folder-structure)
 - [Tech Stack](#tech-stack)
 - [Database Schema](#database-schema)
@@ -29,11 +32,9 @@ https://drive.google.com/file/d/1hH87oa7_wwOoAvdtys3RR4WJP1i6JUAM/view?usp=shari
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Example CSV](#example-csv)
-- [Screenshots](#screenshots)
 - [Performance Optimizations](#performance-optimizations)
 - [Security Considerations](#security-considerations)
 - [Scalability](#scalability)
-- [Future Improvements](#future-improvements)
 - [Author](#author)
 - [License](#license)
 
@@ -50,10 +51,13 @@ Traditional CSV importers rely on rigid column-name matching. If a user uploads 
 - **Column names are never consistent.** One vendor calls it `"Full Name"`, another uses `"Name"`, a third splits it into `"First Name"` and `"Last Name"`.
 - **Data is messy.** Phone numbers come with country codes, dashes, parentheses, or spaces. Emails are mixed in with notes.
 - **Manual mapping does not scale.** Asking users to manually map 15+ columns every time they import a file is a poor user experience.
+- **No organizational structure.** Flat import flows lack the concept of projects or workspaces, making it difficult to track which leads came from which campaign or source.
 
 ### The AI-Based Solution
 
-GrowEasy uses **Google Gemini** to semantically understand the _intent_ of each CSV column — not just its header text. The AI reads sample data, infers which CRM field each column maps to, and extracts normalized values from every row. This means a CSV with columns named in Hindi, abbreviated, or completely unconventional will still import correctly.
+GrowEasy uses **Google Gemini 2.5 Flash** to semantically understand the intent of each CSV column — not just its header text. The AI reads sample data, infers which CRM field each column maps to, and extracts normalized values from every row. This means a CSV with columns named in Hindi, abbreviated, or completely unconventional will still import correctly.
+
+Project workspaces allow users to group imports logically. Every import is associated with a project, and the full import history is accessible from the project sidebar — all stored in MongoDB, with no external file storage required.
 
 ### Assignment Objective
 
@@ -65,18 +69,24 @@ This project was built as a submission for the **GrowEasy Software Developer Ass
 
 | Category | Feature | Description |
 |---|---|---|
-|  AI | **Semantic Header Mapping** | Gemini AI analyzes CSV headers and sample data to infer CRM field mappings |
-|  AI | **Batch Field Extraction** | Raw rows are processed in configurable batches with automatic retry logic |
-|  CSV | **Universal CSV Support** | Handles any column names, ordering, delimiters, and encoding |
-|  Normalization | **Phone Normalization** | Strips country codes, dashes, spaces, and brackets from phone numbers |
-|  Normalization | **Email Validation** | RFC-compliant email cleaning and deduplication |
-|  Normalization | **Enum Enforcement** | `crm_status` and `data_source` are validated against strict enumerated values |
-|  Validation | **Intelligent Skip Logic** | Records are only skipped when _both_ email and phone are missing |
-|  Analytics | **Import Statistics** | Real-time success rate, imported count, and skipped count with reasons |
-|  Database | **MongoDB Persistence** | Valid records and import session metadata are persisted to MongoDB |
-|  UI | **Responsive SaaS Interface** | Clean, tabbed results dashboard with imported/skipped record views |
-|  Reliability | **Error Isolation** | AI failures, DB failures, and validation failures are handled independently |
-|  Performance | **Chunked Processing** | Large datasets are split into batches to respect API rate limits |
+| Auth | User Registration | Create an account with name, email, and password. Passwords are hashed with bcrypt. |
+| Auth | Session Management | JWT token stored in an httpOnly cookie. 7-day expiry. Server-side validation on every request via Next.js middleware. |
+| Auth | Data Isolation | All projects and imports are scoped to the authenticated user. No user can see another user's data. |
+| Workspace | Projects Dashboard | Landing page shows all projects belonging to the logged-in user. Create, open, and manage projects from one view. |
+| Workspace | Project Sidebar | Each project page has a persistent left sidebar listing all previous imports with date, total records, and success count. |
+| Workspace | Import Stats | Completing an import automatically increments the project's aggregate statistics. |
+| AI | Semantic Header Mapping | Gemini AI analyzes CSV headers and sample data to infer CRM field mappings. |
+| AI | Batch Field Extraction | Raw rows are processed in configurable batches with automatic retry logic. |
+| CSV | Universal CSV Support | Handles any column names, ordering, delimiters, and encoding. |
+| Normalization | Phone Normalization | Strips country codes, dashes, spaces, and brackets from phone numbers. |
+| Normalization | Email Validation | RFC-compliant email cleaning and deduplication. |
+| Normalization | Enum Enforcement | `crm_status` and `data_source` are validated against strict enumerated values. |
+| Validation | Intelligent Skip Logic | Records are only skipped when both email and phone are missing. |
+| Analytics | Import Statistics | Real-time success rate, imported count, and skipped count with reasons. |
+| Database | MongoDB Persistence | Valid records, import sessions, projects, and users are persisted to MongoDB. |
+| UI | Responsive SaaS Interface | Clean, dark-mode-capable results dashboard with imported and skipped record views. |
+| Reliability | Error Isolation | AI failures, DB failures, and validation failures are handled independently. |
+| Performance | Chunked Processing | Large datasets are split into batches to respect API rate limits. |
 
 ---
 
@@ -86,20 +96,27 @@ This project was built as a submission for the **GrowEasy Software Developer Ass
 
 ```mermaid
 flowchart TD
-    A["CSV Upload"] --> B["🔍 CSV Parser (PapaParse)"]
-    B --> C["AI Mapping Engine (Gemini)"]
-    C --> D[" Validation Layer"]
-    D --> E[" CRM Transformer"]
-    E --> F{"Valid?"}
-    F -- Yes --> G[" MongoDB"]
-    F -- No --> H[" Skip Registry"]
-    G --> I[" Results Dashboard"]
-    H --> I
+    A["Browser"] --> AUTH["Auth Middleware (proxy.ts)"]
+    AUTH -->|"Valid JWT Cookie"| DASH["Projects Dashboard (/)"]
+    AUTH -->|"No Cookie"| LOGIN["/login or /register"]
 
-    style A fill:#1a1a2e,stroke:#e94560,color:#fff
-    style C fill:#1a1a2e,stroke:#4285f4,color:#fff
-    style G fill:#1a1a2e,stroke:#47a248,color:#fff
-    style I fill:#1a1a2e,stroke:#f39c12,color:#fff
+    DASH --> PROJ["Project Page (/projects/[projectId])"]
+    PROJ --> SIDEBAR["Import History Sidebar"]
+    PROJ --> UPLOAD["CSV Upload"]
+
+    UPLOAD --> PARSE["CSV Parser (PapaParse)"]
+    PARSE --> API["POST /api/import"]
+    API --> SVC["Import Service"]
+    SVC --> ORCH["Extraction Orchestrator"]
+    ORCH --> GEMINI["Gemini 2.5 Flash"]
+    GEMINI --> VAL["Validation Service"]
+    VAL --> DB["MongoDB"]
+    DB --> RESULTS["Import Results UI"]
+    DB --> SIDEBAR
+
+    style GEMINI fill:#4285f4,stroke:#333,color:#fff
+    style DB fill:#47a248,stroke:#333,color:#fff
+    style AUTH fill:#e94560,stroke:#333,color:#fff
 ```
 
 ### Backend Request Flow
@@ -107,16 +124,19 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     participant Client as Frontend
-    participant API as API Route
+    participant MW as Middleware
+    participant API as /api/import
     participant SVC as Import Service
     participant ORCH as Extraction Orchestrator
     participant AI as Gemini AI
     participant VAL as Validation Service
     participant DB as MongoDB
 
-    Client->>API: POST /api/import { rawRows }
+    Client->>MW: Any request with cookie
+    MW->>MW: Verify JWT (jose)
+    MW->>API: POST /api/import { projectId, rawRows }
     API->>API: Validate payload (Zod)
-    API->>SVC: processImport(rawRows, apiKey)
+    API->>SVC: processImport(projectId, rawRows, apiKey)
     SVC->>SVC: Filter empty rows
     SVC->>ORCH: processDataset(rows, apiKey)
 
@@ -133,30 +153,37 @@ sequenceDiagram
     end
 
     SVC->>DB: CrmLeadRepository.insertMany(validRecords)
-    SVC->>DB: ImportSessionRepository.create(stats)
+    SVC->>DB: ImportSessionRepository.create(projectId, stats)
     SVC-->>API: ImportResult { stats, valid, skipped }
     API-->>Client: JSON Response
 ```
 
-### AI Processing Pipeline
+---
 
-```mermaid
-flowchart LR
-    A["Upload CSV"] --> B["Parse with PapaParse"]
-    B --> C["Extract Headers"]
-    C --> D["AI Header Mapping"]
-    D --> E["Chunk into Batches"]
-    E --> F["AI Semantic Extraction"]
-    F --> G["Clean & Normalize"]
-    G --> H{"Both email & phone missing?"}
-    H -- Yes --> I["Skip + Log Reason"]
-    H -- No --> J["Save to MongoDB"]
-    I --> K["Generate Statistics"]
-    J --> K
+## User Flow
 
-    style F fill:#4285f4,stroke:#333,color:#fff
-    style J fill:#47a248,stroke:#333,color:#fff
-    style I fill:#e94560,stroke:#333,color:#fff
+```
+Register / Login
+      |
+      v
+Projects Dashboard  -->  Create Project
+      |
+      v
+Open Project
+      |
+      +--- Left Sidebar: Import History (previous uploads, dates, stats)
+      |
+      v
+Upload CSV
+      |
+      v
+Preview CSV
+      |
+      v
+AI Extraction + Validation
+      |
+      v
+Import Results  -->  Sidebar auto-refreshes with new session
 ```
 
 ---
@@ -165,75 +192,97 @@ flowchart LR
 
 ```
 groweasy/
-├── app/                              # Next.js App Router
+├── middleware.ts                         # JWT auth guard — protects all routes except /login and /register
+├── app/
 │   ├── api/
-│   │   ├── import/route.ts           # POST /api/import — AI extraction + persistence
-│   │   └── map/route.ts              # POST /api/map — AI header mapping
-│   ├── page.tsx                      # Main application page
-│   ├── layout.tsx                    # Root layout with metadata
-│   └── globals.css                   # Global styles and design tokens
+│   │   ├── auth/
+│   │   │   ├── login/route.ts            # POST /api/auth/login
+│   │   │   ├── register/route.ts         # POST /api/auth/register
+│   │   │   └── logout/route.ts           # POST /api/auth/logout
+│   │   ├── import/route.ts               # POST /api/import — AI extraction + persistence
+│   │   ├── map/route.ts                  # POST /api/map — AI header mapping
+│   │   └── projects/
+│   │       ├── route.ts                  # GET/POST /api/projects (user-scoped)
+│   │       └── [projectId]/
+│   │           ├── route.ts              # GET/PATCH/DELETE /api/projects/[projectId]
+│   │           └── sessions/route.ts     # GET /api/projects/[projectId]/sessions
+│   ├── login/page.tsx                    # Login page
+│   ├── register/page.tsx                 # Registration page
+│   ├── projects/
+│   │   └── [projectId]/page.tsx          # Project import page with sidebar
+│   ├── page.tsx                          # Projects dashboard
+│   ├── layout.tsx                        # Root layout with metadata
+│   └── globals.css                       # Global styles and design tokens
 │
 ├── src/
 │   ├── components/
-│   │   ├── features/                 # Domain-specific components
-│   │   │   ├── file-upload.tsx       # Drag-and-drop CSV upload with validation
-│   │   │   ├── csv-preview.tsx       # Parsed CSV data preview table
-│   │   │   ├── processing-state.tsx  # AI processing loading state
-│   │   │   ├── import-results.tsx    # Tabbed import results (imported/skipped)
-│   │   │   └── data-table.tsx        # Reusable data table renderer
-│   │   ├── layout/                   # Structural layout components
-│   │   │   ├── header.tsx            # Application header
-│   │   │   ├── page-shell.tsx        # Page container wrapper
-│   │   │   ├── page-title.tsx        # Page title component
-│   │   │   └── section.tsx           # Content section wrapper
-│   │   └── ui/                       # Primitive UI components
-│   │       ├── badge.tsx             # Status badge
-│   │       ├── button.tsx            # Button with variants
-│   │       ├── card.tsx              # Card container
-│   │       ├── divider.tsx           # Visual divider
-│   │       ├── input.tsx             # Form input
-│   │       ├── skeleton.tsx          # Loading skeleton
-│   │       └── states.tsx            # Empty/error state placeholders
+│   │   ├── features/
+│   │   │   ├── file-upload.tsx           # Drag-and-drop CSV upload
+│   │   │   ├── csv-preview.tsx           # Parsed CSV data preview table
+│   │   │   ├── processing-state.tsx      # AI processing loading state
+│   │   │   ├── import-results.tsx        # Tabbed import results
+│   │   │   ├── data-table.tsx            # Reusable data table with text-wrap support
+│   │   │   ├── project-card.tsx          # Project card for dashboard grid
+│   │   │   └── create-project-modal.tsx  # Modal for creating new projects
+│   │   ├── layout/
+│   │   │   ├── header.tsx                # Header with theme toggle and logout button
+│   │   │   ├── project-sidebar.tsx       # Import history sidebar for project pages
+│   │   │   ├── page-shell.tsx
+│   │   │   ├── page-title.tsx
+│   │   │   └── section.tsx
+│   │   └── ui/
+│   │       ├── badge.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── divider.tsx
+│   │       ├── input.tsx
+│   │       ├── skeleton.tsx
+│   │       └── states.tsx
 │   │
 │   ├── core/
-│   │   ├── constants/crm.ts          # CRM schema, AI prompts, batch config
-│   │   └── types/crm.ts             # TypeScript interfaces and Zod enums
+│   │   ├── constants/crm.ts              # CRM schema, AI prompts, batch config
+│   │   └── types/crm.ts                  # TypeScript interfaces and Zod enums
 │   │
 │   ├── hooks/
-│   │   └── use-import-flow.ts        # React hook managing the import state machine
+│   │   └── use-import-flow.ts            # React hook managing the import state machine
 │   │
 │   ├── lib/
 │   │   ├── ai/
-│   │   │   ├── provider.ts           # IAIMappingProvider interface (abstraction)
-│   │   │   ├── gemini.provider.ts    # Gemini API implementation
-│   │   │   ├── mock.provider.ts      # Mock provider for testing
-│   │   │   └── extractor.ts          # AI batch extraction service
+│   │   │   ├── provider.ts               # IAIMappingProvider interface
+│   │   │   ├── gemini.provider.ts        # Gemini API implementation
+│   │   │   ├── mock.provider.ts          # Mock provider for testing
+│   │   │   └── extractor.ts              # AI batch extraction (no responseMimeType)
 │   │   ├── api/
-│   │   │   └── client.ts             # Frontend API client
+│   │   │   └── client.ts                 # Frontend API client
+│   │   ├── auth/
+│   │   │   ├── jwt.ts                    # jose-based JWT sign/verify
+│   │   │   └── session.ts                # Server-side cookie reader helper
 │   │   ├── csv/
-│   │   │   └── parser.ts             # PapaParse CSV parsing wrapper
+│   │   │   └── parser.ts                 # PapaParse CSV parsing wrapper
 │   │   ├── db/
-│   │   │   ├── mongoose.ts           # MongoDB connection singleton
+│   │   │   ├── mongoose.ts               # MongoDB connection singleton
 │   │   │   ├── models/
-│   │   │   │   ├── CrmLead.ts        # Mongoose schema for CRM leads
-│   │   │   │   └── ImportSession.ts  # Mongoose schema for import sessions
+│   │   │   │   ├── User.ts               # User schema
+│   │   │   │   ├── Project.ts            # Project schema (userId-scoped)
+│   │   │   │   ├── CrmLead.ts            # CRM lead schema
+│   │   │   │   └── ImportSession.ts      # Import session schema (projectId-linked)
 │   │   │   └── repositories/
-│   │   │       ├── crm-lead.repository.ts       # CRM lead data access
-│   │   │       └── import-session.repository.ts # Session data access
+│   │   │       ├── crm-lead.repository.ts
+│   │   │       └── import-session.repository.ts
 │   │   ├── logger/
-│   │   │   └── logger.ts             # Structured JSON logger
+│   │   │   └── logger.ts                 # Structured JSON logger
 │   │   └── utils/
-│   │       ├── batch.ts              # chunkArray + withRetry utilities
-│   │       ├── cleaners.ts           # Phone, email, date normalization
-│   │       └── cn.ts                 # Tailwind class merge utility
+│   │       ├── batch.ts                  # chunkArray + withRetry utilities
+│   │       ├── cleaners.ts               # Phone, email, date normalization
+│   │       └── cn.ts                     # Class name merge utility
 │   │
 │   └── services/
-│       ├── import.service.ts          # Import orchestration (extraction → validation → persistence)
-│       ├── extraction.orchestrator.ts # Batched AI extraction with retry
-│       ├── mapping.service.ts         # Header-to-CRM field mapping
-│       └── validation.service.ts      # Record validation and normalization
+│       ├── import.service.ts             # Import orchestration
+│       ├── extraction.orchestrator.ts    # Batched AI extraction with retry
+│       ├── mapping.service.ts            # Header-to-CRM field mapping
+│       └── validation.service.ts         # Record validation and normalization
 │
-├── .env.example                       # Environment variable template
+├── .env.example
 ├── package.json
 ├── tsconfig.json
 └── next.config.ts
@@ -250,7 +299,7 @@ groweasy/
 | [Next.js 16](https://nextjs.org/) | React framework with App Router and Turbopack |
 | [React 19](https://react.dev/) | UI component library |
 | [TypeScript 5](https://www.typescriptlang.org/) | Static type safety across the entire codebase |
-| [Tailwind CSS 4](https://tailwindcss.com/) | Utility-first styling |
+| Vanilla CSS with Design Tokens | Custom design system — no utility-class framework dependency |
 | [Lucide React](https://lucide.dev/) | Icon library |
 
 ### Backend
@@ -260,19 +309,21 @@ groweasy/
 | [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) | Serverless API endpoints |
 | [Zod 4](https://zod.dev/) | Runtime request validation and schema parsing |
 | [PapaParse](https://www.papaparse.com/) | High-performance CSV parsing |
+| [bcryptjs](https://github.com/dcodeIO/bcrypt.js) | Password hashing |
+| [jose](https://github.com/panva/jose) | Edge-compatible JWT signing and verification |
 
 ### AI
 
 | Technology | Purpose |
 |---|---|
-| [Google Gemini API](https://ai.google.dev/) | LLM-powered semantic extraction and header mapping |
+| [Google Gemini 2.5 Flash](https://ai.google.dev/) | LLM-powered semantic extraction and header mapping |
 | Provider Abstraction (`IAIMappingProvider`) | Swap between Gemini, Mock, or future providers without code changes |
 
 ### Database
 
 | Technology | Purpose |
 |---|---|
-| [MongoDB](https://www.mongodb.com/) | Document database for CRM lead storage |
+| [MongoDB](https://www.mongodb.com/) | Document database for users, projects, sessions, and CRM leads |
 | [Mongoose 9](https://mongoosejs.com/) | ODM with schema validation and connection pooling |
 
 ### Deployment
@@ -281,16 +332,49 @@ groweasy/
 |---|---|
 | [Vercel](https://vercel.com/) | Edge-optimized hosting with automatic CI/CD |
 
-### Developer Experience
-
-| Technology | Purpose |
-|---|---|
-| [ESLint 9](https://eslint.org/) | Code quality enforcement |
-| [Turbopack](https://turbo.build/pack) | Sub-second hot module replacement in development |
-
 ---
 
 ## Database Schema
+
+### User Model
+
+Stores registered user credentials.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `String` | Yes | Full name of the user |
+| `email` | `String` | Yes | Unique email address (lowercase) |
+| `password` | `String` | Yes | bcrypt-hashed password |
+| `createdAt` | `Date` | Auto | Mongoose auto-generated timestamp |
+
+### Project Model
+
+Stores project workspace metadata, scoped to a user.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `userId` | `ObjectId` | Yes | Reference to the owning user |
+| `project_name` | `String` | Yes | Display name of the project |
+| `description` | `String` | No | Optional project description |
+| `total_imports` | `Number` | No | Running count of imports in this project |
+| `total_records` | `Number` | No | Total records processed across all imports |
+| `imported_records` | `Number` | No | Total successfully imported records |
+| `skipped_records` | `Number` | No | Total skipped records |
+| `createdAt` | `Date` | Auto | Mongoose auto-generated timestamp |
+
+### Import Session Model
+
+Stores metadata for each individual import operation.
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `projectId` | `ObjectId` | Yes | Reference to the parent project |
+| `sessionName` | `String` | Yes | Auto-generated session identifier |
+| `totalRecords` | `Number` | Yes | Total records processed |
+| `importedCount` | `Number` | Yes | Records successfully imported |
+| `skippedCount` | `Number` | Yes | Records that failed validation |
+| `successRate` | `Number` | Yes | Percentage of successful imports |
+| `createdAt` | `Date` | Auto | Mongoose auto-generated timestamp |
 
 ### CRM Lead Model
 
@@ -317,44 +401,22 @@ Stores each successfully imported lead record.
 | `extra_phones` | `[String]` | No | Additional phone numbers found in the row |
 | `importSessionId` | `ObjectId` | No | Reference to the parent import session |
 | `createdAt` | `Date` | Auto | Mongoose auto-generated timestamp |
-| `updatedAt` | `Date` | Auto | Mongoose auto-generated timestamp |
-
-### Import Session Model
-
-Stores metadata for each import operation.
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `sessionName` | `String` | Yes | Auto-generated session identifier |
-| `totalRecords` | `Number` | Yes | Total records processed |
-| `importedCount` | `Number` | Yes | Records successfully imported |
-| `skippedCount` | `Number` | Yes | Records that failed validation |
-| `successRate` | `Number` | Yes | Percentage of successful imports |
-| `createdAt` | `Date` | Auto | Mongoose auto-generated timestamp |
-| `updatedAt` | `Date` | Auto | Mongoose auto-generated timestamp |
 
 ---
 
 ## API Documentation
 
-### `POST /api/map`
+### `POST /api/auth/register`
 
-Maps CSV headers to CRM schema fields using AI.
+Creates a new user account and sets a session cookie.
 
 **Request**
 
 ```json
 {
-  "headers": ["Full Name", "Contact Number", "Mail ID", "Remarks"],
-  "sampleRows": [
-    {
-      "Full Name": "Rahul Sharma",
-      "Contact Number": "+91-9876543210",
-      "Mail ID": "rahul@example.com",
-      "Remarks": "Interested in 2BHK"
-    }
-  ],
-  "provider": "gemini"
+  "name": "Rahul Sharma",
+  "email": "rahul@example.com",
+  "password": "securepassword"
 }
 ```
 
@@ -363,14 +425,77 @@ Maps CSV headers to CRM schema fields using AI.
 ```json
 {
   "success": true,
+  "user": { "name": "Rahul Sharma", "email": "rahul@example.com" }
+}
+```
+
+Sets an `httpOnly` cookie `groweasy_token` containing a signed JWT.
+
+---
+
+### `POST /api/auth/login`
+
+Authenticates an existing user and sets a session cookie.
+
+**Request**
+
+```json
+{
+  "email": "rahul@example.com",
+  "password": "securepassword"
+}
+```
+
+---
+
+### `POST /api/auth/logout`
+
+Clears the session cookie.
+
+---
+
+### `GET /api/projects`
+
+Returns all projects belonging to the authenticated user, sorted by last update.
+
+**Response**
+
+```json
+{
+  "success": true,
   "data": [
-    { "crmFieldKey": "name", "csvHeader": "Full Name" },
-    { "crmFieldKey": "mobile_without_country_code", "csvHeader": "Contact Number" },
-    { "crmFieldKey": "email", "csvHeader": "Mail ID" },
-    { "crmFieldKey": "notes", "csvHeader": "Remarks" }
+    {
+      "_id": "...",
+      "project_name": "Facebook Leads Q2",
+      "total_imports": 4,
+      "total_records": 320,
+      "imported_records": 298,
+      "skipped_records": 22
+    }
   ]
 }
 ```
+
+---
+
+### `POST /api/projects`
+
+Creates a new project under the authenticated user.
+
+**Request**
+
+```json
+{
+  "project_name": "Facebook Leads Q2",
+  "description": "Leads from Meta campaign, July 2026"
+}
+```
+
+---
+
+### `GET /api/projects/[projectId]/sessions`
+
+Returns all import sessions for a specific project, sorted newest first.
 
 ---
 
@@ -382,18 +507,13 @@ Processes raw CSV rows through the AI extraction pipeline and persists results t
 
 ```json
 {
+  "projectId": "64ab1234...",
   "rawRows": [
     {
       "Full Name": "Rahul Sharma",
       "Contact Number": "+91-9876543210",
       "Mail ID": "rahul@example.com",
       "Remarks": "Interested in 2BHK"
-    },
-    {
-      "Full Name": "Priya Patel",
-      "Contact Number": "",
-      "Mail ID": "",
-      "Remarks": "No contact info"
     }
   ]
 }
@@ -406,29 +526,13 @@ Processes raw CSV rows through the AI extraction pipeline and persists results t
   "success": true,
   "data": {
     "stats": {
-      "totalRecords": 2,
+      "totalRecords": 1,
       "importedCount": 1,
-      "skippedCount": 1,
-      "successRate": 50
+      "skippedCount": 0,
+      "successRate": 100
     },
-    "validRecords": [
-      {
-        "index": 0,
-        "originalData": { "Full Name": "Rahul Sharma", "...": "..." },
-        "extractedData": { "name": "Rahul Sharma", "email": "rahul@example.com", "...": "..." },
-        "normalizedData": { "name": "Rahul Sharma", "email": "rahul@example.com", "...": "..." },
-        "isValid": true,
-        "errors": []
-      }
-    ],
-    "skippedRecords": [
-      {
-        "index": 1,
-        "originalData": { "Full Name": "Priya Patel", "...": "..." },
-        "isValid": false,
-        "errors": ["Record skipped: Both mobile number and email are missing or invalid."]
-      }
-    ]
+    "validRecords": [...],
+    "skippedRecords": []
   }
 }
 ```
@@ -437,13 +541,13 @@ Processes raw CSV rows through the AI extraction pipeline and persists results t
 
 | Rule | Behavior |
 |---|---|
-| Both email and phone missing | Record is **skipped** |
-| Only email present | Record is **imported** ✅ |
-| Only phone present | Record is **imported** ✅ |
-| Both email and phone present | Record is **imported** ✅ |
+| Both email and phone missing | Record is skipped |
+| Only email present | Record is imported |
+| Only phone present | Record is imported |
+| Both email and phone present | Record is imported |
 | `crm_status` not in enum | Field set to `null`, record still imported |
 | `data_source` not in enum | Field set to `""`, record still imported |
-| AI extraction returns null | Record is **skipped** with error message |
+| AI extraction returns null | Record is skipped with error message |
 
 ---
 
@@ -451,7 +555,7 @@ Processes raw CSV rows through the AI extraction pipeline and persists results t
 
 ### Prerequisites
 
-- **Node.js** ≥ 18.0
+- **Node.js** >= 18.0
 - **MongoDB** (local instance or [MongoDB Atlas](https://www.mongodb.com/atlas))
 - **Gemini API Key** ([Get one here](https://aistudio.google.com/apikey))
 
@@ -467,13 +571,15 @@ npm install
 
 # 3. Configure environment variables
 cp .env.example .env
-# Edit .env with your actual values (see Environment Variables section below)
+# Edit .env with your actual values
 
 # 4. Start the development server
 npm run dev
 ```
 
 The application will be available at **http://localhost:3000**.
+
+Open `/register` to create your first account. After registration you will be redirected to the Projects Dashboard.
 
 ### Production Build
 
@@ -490,10 +596,11 @@ Create a `.env` file in the project root using `.env.example` as a template.
 
 | Variable | Description | Required |
 |---|---|---|
-| `GEMINI_API_KEY` | Google Gemini API key for AI-powered extraction |  Yes |
+| `GEMINI_API_KEY` | Google Gemini API key for AI-powered extraction | Yes |
 | `MONGODB_URI` | MongoDB connection string (e.g., `mongodb://localhost:27017/groweasy`) | Yes |
+| `JWT_SECRET` | Secret key used to sign JWT tokens. Use a long random string in production. | Recommended |
 
-> **Security Note:** Never commit your `.env` file. The `.gitignore` is pre-configured to exclude it.
+> **Security note:** Never commit your `.env` file. The `.gitignore` is pre-configured to exclude it. If `JWT_SECRET` is not set, the application falls back to a hardcoded development key — always set this in production.
 
 ---
 
@@ -526,30 +633,18 @@ All three formats produce identical normalized CRM output.
 
 ---
 
-## Screenshots
-
-> Screenshots can be added after deployment. Placeholder sections for visual documentation:
-
-| Screen | Description |
-|---|---|
-| **Upload Screen** | Drag-and-drop file upload with CSV format validation |
-| **CSV Preview** | Parsed data table showing raw CSV content before processing |
-| **Processing State** | Animated loading indicator during AI extraction |
-| **Import Results** | Tabbed dashboard showing imported records, skipped records, and statistics |
-
----
-
 ## Performance Optimizations
 
 | Optimization | Implementation |
 |---|---|
-| **Batch Processing** | Large datasets are split into configurable chunks (`BATCH_SIZE = 10`) to prevent API timeouts and respect rate limits |
-| **Automatic Retries** | Failed AI batches are retried up to `MAX_RETRIES = 3` times with the `withRetry` utility |
-| **Index Alignment** | Failed batches insert `null` placeholders to maintain 1:1 row alignment, preventing data corruption |
-| **Provider Abstraction** | The `IAIMappingProvider` interface allows swapping AI backends without modifying business logic |
-| **Connection Pooling** | Mongoose maintains a singleton connection pool, reused across serverless function invocations |
-| **Empty Row Filtering** | Completely empty CSV rows are pre-filtered before AI processing to reduce unnecessary API calls |
-| **Minimal Re-renders** | The `useImportFlow` hook manages the import state machine, preventing unnecessary React re-renders |
+| Batch Processing | Large datasets are split into configurable chunks (`BATCH_SIZE = 10`) to prevent API timeouts and respect rate limits |
+| Automatic Retries | Failed AI batches are retried up to `MAX_RETRIES = 3` times with the `withRetry` utility |
+| Index Alignment | Failed batches insert `null` placeholders to maintain 1:1 row alignment, preventing data corruption |
+| Provider Abstraction | The `IAIMappingProvider` interface allows swapping AI backends without modifying business logic |
+| Connection Pooling | Mongoose maintains a singleton connection pool, reused across serverless function invocations |
+| Empty Row Filtering | Completely empty CSV rows are pre-filtered before AI processing to reduce unnecessary API calls |
+| Minimal Re-renders | The `useImportFlow` hook manages the import state machine, preventing unnecessary React re-renders |
+| Atomic Stats Updates | Project statistics use MongoDB `$inc` atomic operations to avoid race conditions during concurrent imports |
 
 ---
 
@@ -557,12 +652,14 @@ All three formats produce identical normalized CRM output.
 
 | Concern | Mitigation |
 |---|---|
-| **API Key Exposure** | Gemini API key is stored server-side in `.env` and never sent to the client. All AI calls are made from API routes. |
-| **Input Validation** | All API requests are validated at the boundary using Zod schemas before any processing occurs |
-| **Payload Sanitization** | CSV data is parsed with PapaParse (which handles injection vectors) and validated before AI submission |
-| **Output Validation** | AI-extracted enum values (`crm_status`, `data_source`) are validated against strict Zod enums |
-| **Error Isolation** | Database failures do not prevent the API from returning import results to the client |
-| **Dependency Audit** | Production dependencies are minimal and well-maintained (Next.js, Mongoose, Zod, PapaParse) |
+| Authentication | All application routes (pages and API endpoints) are protected by Next.js middleware that verifies a signed JWT stored in an httpOnly, SameSite cookie |
+| Data Isolation | Projects and import sessions include a `userId` or `projectId` field. API routes verify ownership before returning or modifying data |
+| Password Storage | User passwords are hashed with bcrypt (10 rounds) before storage. Plain-text passwords are never written to the database |
+| API Key Exposure | Gemini API key is stored server-side in `.env` and never sent to the client. All AI calls are made from API routes |
+| Input Validation | All API requests are validated at the boundary using Zod schemas before any processing occurs |
+| Payload Sanitization | CSV data is parsed with PapaParse and validated before AI submission |
+| Output Validation | AI-extracted enum values (`crm_status`, `data_source`) are validated against strict Zod enums |
+| Error Isolation | Database failures do not prevent the API from returning import results to the client |
 
 ---
 
@@ -572,25 +669,13 @@ The architecture is designed with clear separation of concerns to support future
 
 | Dimension | Current | Scalable Path |
 |---|---|---|
-| **AI Providers** | Gemini | Add Anthropic, OpenAI, or local models via the `IAIMappingProvider` interface |
-| **CRM Targets** | Single schema | Define additional schemas in `core/constants/` and add transformation layers |
-| **Record Volume** | Synchronous batches | Introduce a job queue (BullMQ, AWS SQS) with background workers |
-| **Database** | Single MongoDB | Shard collections by `importSessionId` or migrate to a time-series optimized store |
-| **File Size** | In-memory parsing | Stream large files with chunked uploads and server-side streaming parsers |
-| **Concurrency** | Sequential batches | Add a worker pool with configurable concurrency limits per API key |
-
----
-
-## Future Improvements
-
-- [ ] **Streaming Imports** — Process large files (100K+ rows) with chunked streaming instead of loading into memory
-- [ ] **Background Jobs** — Move AI extraction to a background worker queue for non-blocking imports
-- [ ] **WebSocket Progress** — Real-time progress updates during long-running imports
-- [ ] **Multiple CRM Exports** — Export to Salesforce, HubSpot, or Zoho CRM in addition to the built-in schema
-- [ ] **Import History** — Dashboard showing past import sessions with filtering and search
-- [ ] **Duplicate Detection** — Identify and merge duplicate leads based on email or phone
-- [ ] **Column Mapping Review** — Allow users to review and correct AI-suggested mappings before import
-- [ ] **Rate Limit Handling** — Intelligent backoff with per-model quota tracking
+| AI Providers | Gemini 2.5 Flash | Add Anthropic, OpenAI, or local models via the `IAIMappingProvider` interface |
+| CRM Targets | Single schema | Define additional schemas in `core/constants/` and add transformation layers |
+| Record Volume | Synchronous batches | Introduce a job queue (BullMQ, AWS SQS) with background workers |
+| Database | Single MongoDB | Shard collections by `userId` or migrate to a time-series optimized store |
+| File Size | In-memory parsing | Stream large files with chunked uploads and server-side streaming parsers |
+| Concurrency | Sequential batches | Add a worker pool with configurable concurrency limits per API key |
+| Multi-tenancy | Per-user isolation | Extend `userId` scoping to all collections; add team/organization layer above users |
 
 ---
 
