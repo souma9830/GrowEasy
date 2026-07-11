@@ -56,11 +56,15 @@ export const DataTable: React.FC<DataTableProps> = ({
               {headers.map((header) => {
                 const value = String(row[header] ?? '');
                 const isEmpty = !value;
+                const isLongText = value.length > 35;
                 return (
                   <td
                     key={header}
                     className={cn(
-                      'px-3 py-2.5 whitespace-nowrap max-w-[220px] truncate',
+                      'px-3 py-2.5',
+                      isLongText 
+                        ? 'min-w-[250px] whitespace-normal break-words' 
+                        : 'whitespace-nowrap max-w-[220px] truncate',
                       isEmpty ? 'text-[var(--text-tertiary)] italic' : 'text-[var(--text-primary)]'
                     )}
                     title={value || undefined}
