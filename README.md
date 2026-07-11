@@ -65,18 +65,18 @@ This project was built as a submission for the **GrowEasy Software Developer Ass
 
 | Category | Feature | Description |
 |---|---|---|
-| 🤖 AI | **Semantic Header Mapping** | Gemini AI analyzes CSV headers and sample data to infer CRM field mappings |
-| 🤖 AI | **Batch Field Extraction** | Raw rows are processed in configurable batches with automatic retry logic |
-| 📄 CSV | **Universal CSV Support** | Handles any column names, ordering, delimiters, and encoding |
-| 🔧 Normalization | **Phone Normalization** | Strips country codes, dashes, spaces, and brackets from phone numbers |
-| 🔧 Normalization | **Email Validation** | RFC-compliant email cleaning and deduplication |
-| 🔧 Normalization | **Enum Enforcement** | `crm_status` and `data_source` are validated against strict enumerated values |
-| ✅ Validation | **Intelligent Skip Logic** | Records are only skipped when _both_ email and phone are missing |
-| 📊 Analytics | **Import Statistics** | Real-time success rate, imported count, and skipped count with reasons |
-| 💾 Database | **MongoDB Persistence** | Valid records and import session metadata are persisted to MongoDB |
-| 🎨 UI | **Responsive SaaS Interface** | Clean, tabbed results dashboard with imported/skipped record views |
-| 🛡️ Reliability | **Error Isolation** | AI failures, DB failures, and validation failures are handled independently |
-| ⚡ Performance | **Chunked Processing** | Large datasets are split into batches to respect API rate limits |
+|  AI | **Semantic Header Mapping** | Gemini AI analyzes CSV headers and sample data to infer CRM field mappings |
+|  AI | **Batch Field Extraction** | Raw rows are processed in configurable batches with automatic retry logic |
+|  CSV | **Universal CSV Support** | Handles any column names, ordering, delimiters, and encoding |
+|  Normalization | **Phone Normalization** | Strips country codes, dashes, spaces, and brackets from phone numbers |
+|  Normalization | **Email Validation** | RFC-compliant email cleaning and deduplication |
+|  Normalization | **Enum Enforcement** | `crm_status` and `data_source` are validated against strict enumerated values |
+|  Validation | **Intelligent Skip Logic** | Records are only skipped when _both_ email and phone are missing |
+|  Analytics | **Import Statistics** | Real-time success rate, imported count, and skipped count with reasons |
+|  Database | **MongoDB Persistence** | Valid records and import session metadata are persisted to MongoDB |
+|  UI | **Responsive SaaS Interface** | Clean, tabbed results dashboard with imported/skipped record views |
+|  Reliability | **Error Isolation** | AI failures, DB failures, and validation failures are handled independently |
+|  Performance | **Chunked Processing** | Large datasets are split into batches to respect API rate limits |
 
 ---
 
@@ -86,14 +86,14 @@ This project was built as a submission for the **GrowEasy Software Developer Ass
 
 ```mermaid
 flowchart TD
-    A["📄 CSV Upload"] --> B["🔍 CSV Parser (PapaParse)"]
-    B --> C["🤖 AI Mapping Engine (Gemini)"]
-    C --> D["✅ Validation Layer"]
-    D --> E["🔄 CRM Transformer"]
+    A["CSV Upload"] --> B["🔍 CSV Parser (PapaParse)"]
+    B --> C["AI Mapping Engine (Gemini)"]
+    C --> D[" Validation Layer"]
+    D --> E[" CRM Transformer"]
     E --> F{"Valid?"}
-    F -- Yes --> G["💾 MongoDB"]
-    F -- No --> H["📋 Skip Registry"]
-    G --> I["📊 Results Dashboard"]
+    F -- Yes --> G[" MongoDB"]
+    F -- No --> H[" Skip Registry"]
+    G --> I[" Results Dashboard"]
     H --> I
 
     style A fill:#1a1a2e,stroke:#e94560,color:#fff
@@ -490,8 +490,8 @@ Create a `.env` file in the project root using `.env.example` as a template.
 
 | Variable | Description | Required |
 |---|---|---|
-| `GEMINI_API_KEY` | Google Gemini API key for AI-powered extraction | ✅ Yes |
-| `MONGODB_URI` | MongoDB connection string (e.g., `mongodb://localhost:27017/groweasy`) | ✅ Yes |
+| `GEMINI_API_KEY` | Google Gemini API key for AI-powered extraction |  Yes |
+| `MONGODB_URI` | MongoDB connection string (e.g., `mongodb://localhost:27017/groweasy`) | Yes |
 
 > **Security Note:** Never commit your `.env` file. The `.gitignore` is pre-configured to exclude it.
 
