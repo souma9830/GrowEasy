@@ -27,8 +27,7 @@ export class AIExtractorService {
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.1,
-            // Note: do NOT set responseMimeType here — it causes gemini-2.5-flash
-            // to echo back the input schema instead of applying the extraction prompt.
+            
           }
         })
       });
